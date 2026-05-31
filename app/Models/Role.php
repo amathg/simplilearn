@@ -1,0 +1,10 @@
+<?php
+namespace App\Models;
+use Illuminate\Database\Eloquent\Model;
+
+class Role extends Model {
+    protected $fillable = ['boutique_id','nom','slug','description'];
+    public function boutique()    { return $this->belongsTo(Boutique::class); }
+    public function permissions() { return $this->belongsToMany(Permission::class, 'role_permissions'); }
+    public function admins()      { return $this->hasMany(Admin::class); }
+}
