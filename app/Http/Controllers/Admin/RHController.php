@@ -100,11 +100,31 @@ class RHController extends Controller {
     }
 
     public function paie() {
-        $bid    = session('boutique_id');
+        $bid      = session('boutique_id');
         $employes = Employe::where('boutique_id', $bid)->where('actif', true)->get();
         $fiches   = FichePaie::whereHas('employe', fn($q) => $q->where('boutique_id', $bid))
             ->with('employe')->latest()->take(50)->get();
-        return view('admin.rh.paie', compact('employes','fiches'));
+
+        // Préparer les données pour le JS sans fn() dans @json()
+        $fichesJs = $fiches->map(function($f) {
+            return [
+                'id'          => $f->id,
+                'employe'     => $f->employe->nom_complet,
+                'poste'       => $f->employe->poste,
+                'matricule'   => $f->employe->matricule,
+                'mois'        => $f->mois,
+                'annee'       => $f->annee,
+                'salaire_base'=> $f->salaire_base,
+                'primes'      => $f->primes,
+                'heures_sup'  => $f->heures_sup,
+                'avances'     => $f->avances_deduites,
+                'cotisations' => $f->cotisations,
+                'net'         => $f->net_a_payer,
+                'statut'      => $f->statut,
+            ];
+        });
+
+        return view('admin.rh.paie', compact('employes', 'fiches', 'fichesJs'));
     }
 
     public function genererFiche(Request $request) {

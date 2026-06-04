@@ -65,6 +65,12 @@
     .footer-links a:hover{color:var(--primary)}
     footer hr{border:.5px solid rgba(255,255,255,.08);margin:1.5rem auto;max-width:1200px}
     .footer-bottom{max-width:1200px;margin:0 auto;font-size:11px;text-align:center}
+    .search-bar{background:#fff;border-bottom:.5px solid #E5E5E0;padding:.75rem 1.5rem}
+    .search-wrap{max-width:600px;margin:0 auto;position:relative}
+    .search-input{width:100%;border:.5px solid #E5E5E0;border-radius:8px;padding:10px 40px 10px 14px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;color:#1A1A1A;background:#F9F9F6}
+    .search-input:focus{border-color:var(--primary);background:#fff}
+    .search-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#AAA;font-size:16px;pointer-events:none}
+    .search-clear{position:absolute;right:36px;top:50%;transform:translateY(-50%);color:#AAA;font-size:14px;cursor:pointer;border:none;background:none;display:none}
     @media(max-width:768px){.grid{grid-template-columns:repeat(2,1fr)}.nav-cats{display:none}}
   </style>
 </head>
@@ -102,6 +108,21 @@
     </a>
   </div>
 </nav>
+
+<!-- RECHERCHE -->
+<div class="search-bar">
+  <form method="GET" action="{{ route('boutique.index', $boutique->slug) }}" class="search-wrap">
+    @if(request('cat'))<input type="hidden" name="cat" value="{{ request('cat') }}">@endif
+    @if(request('sort'))<input type="hidden" name="sort" value="{{ request('sort') }}">@endif
+    <input type="text" name="q" class="search-input"
+           placeholder="Rechercher un produit..."
+           value="{{ request('q') }}"
+           id="search-input"
+           autocomplete="off">
+    <button type="button" class="search-clear" id="search-clear" onclick="clearSearch()">×</button>
+    <i class="ti ti-search search-icon"></i>
+  </form>
+</div>
 
 <!-- FILTRES -->
 <div class="filters">
@@ -223,5 +244,22 @@
   <div class="footer-bottom">© {{ date('Y') }} {{ $boutique->nom }} · Propulsé par <a href="/" style="color:var(--primary)">BoutiqueConnect</a></div>
 </footer>
 
+<script>
+// Afficher/masquer le bouton clear
+const si = document.getElementById('search-input');
+const sc = document.getElementById('search-clear');
+if (si && sc) {
+    if (si.value) sc.style.display = 'block';
+    si.addEventListener('input', function() {
+        sc.style.display = this.value ? 'block' : 'none';
+    });
+}
+function clearSearch() {
+    if (si) { si.value = ''; si.focus(); }
+    if (sc) sc.style.display = 'none';
+    // Soumettre le formulaire pour effacer la recherche
+    si.closest('form').submit();
+}
+</script>
 </body>
 </html>

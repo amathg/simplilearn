@@ -13,25 +13,28 @@ class StockController extends Controller {
     public function index() {
         $bid      = session('boutique_id');
         $produits = Produit::where('boutique_id', $bid)
-            ->with(['stock','categorie','marque'])
+            ->with(['stock', 'categorie'])
             ->get();
         $magasins = Magasin::where('boutique_id', $bid)->get();
-        $alertes  = $produits->filter(fn($p) => ($p->stock?->quantite ?? 0) <= $p->stock_minimum);
-        return view('admin.stocks.index', compact('produits','magasins','alertes'));
+        $alertes  = $produits->filter(fn($p) => ($p->stock?->quantite ?? 0) <= ($p->stock_minimum ?? 0));
+        return view('admin.stocks.index', compact('produits', 'magasins', 'alertes'));
     }
 
     public function ajuster(Request $request) {
         $bid = session('boutique_id');
         $request->validate([
             'produit_id' => 'required|exists:produits,id',
-            'quantite'   => 'required|integer',
+            'quantite'   => 'required|integer|min:1',
             'type'       => 'required|in:entree,sortie',
-            'motif'      => 'nullable|string',
+            'motif'      => 'nullable|string|max:255',
         ]);
 
         $produit = Produit::findOrFail($request->produit_id);
-        $stock   = Stock::firstOrCreate(['produit_id' => $produit->id], ['quantite' => 0]);
-        $avant   = $stock->quantite;
+        $stock   = Stock::firstOrCreate(
+            ['produit_id' => $produit->id],
+            ['quantite'   => 0]
+        );
+        $avant = $stock->quantite;
 
         if ($request->type === 'entree') {
             $stock->increment('quantite', abs($request->quantite));
@@ -46,7 +49,7 @@ class StockController extends Controller {
             'quantite'    => abs($request->quantite),
             'stock_avant' => $avant,
             'stock_apres' => $stock->fresh()->quantite,
-            'motif'       => $request->motif,
+            'motif'       => $request->motif ?? 'Ajustement manuel',
             'admin_id'    => session('admin_id'),
         ]);
 
@@ -54,10 +57,12 @@ class StockController extends Controller {
     }
 
     public function mouvements() {
-        $bid       = session('boutique_id');
+        $bid        = session('boutique_id');
         $mouvements = MouvementStock::where('boutique_id', $bid)
-            ->with(['produit','admin'])
-            ->latest()->take(200)->get();
+            ->with(['produit', 'admin'])
+            ->latest()
+            ->take(200)
+            ->get();
         return view('admin.stocks.mouvements', compact('mouvements'));
     }
 }

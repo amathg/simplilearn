@@ -195,6 +195,10 @@
     <a href="{{ route('admin.reporting.index') }}" class="nav-item {{ request()->routeIs('admin.reporting*') ? 'active' : '' }}">
       <i class="ti ti-chart-bar"></i><span>Reporting</span>
     </a>
+    <div class="nav-sec" style="margin-top:.5rem">IA &amp; Marketing</div>
+    <a href="{{ route('admin.agent-ia.index') }}" class="nav-item {{ request()->routeIs('admin.agent-ia*') ? 'active' : '' }}">
+      <i class="ti ti-sparkles"></i><span>Agent IA Pub</span>
+    </a>
 
     <div class="nav-sec">Configuration</div>
     <a href="{{ route('admin.parametres.index') }}" class="nav-item {{ request()->routeIs('admin.parametres*') ? 'active' : '' }}">

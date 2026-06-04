@@ -72,4 +72,54 @@
     </a>
   </div>
 </div>
+
+{{-- GESTION DES CATÉGORIES --}}
+<div class="card" style="padding:1.25rem;margin-top:1.5rem">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+    <h2 style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px">
+      <i class="ti ti-tag" style="color:var(--primary)"></i> Catégories de produits
+    </h2>
+    <button onclick="document.getElementById('form-cat').style.display=document.getElementById('form-cat').style.display==='none'?'flex':'none'"
+            class="btn btn-xs btn-gold">
+      <i class="ti ti-plus"></i> Nouvelle catégorie
+    </button>
+  </div>
+
+  {{-- Formulaire ajout --}}
+  <form id="form-cat" method="POST" action="{{ route('admin.categories.store') }}"
+        style="display:none;gap:.75rem;align-items:flex-end;margin-bottom:1rem;flex-wrap:wrap">
+    @csrf
+    <div class="fg" style="margin:0;flex:1;min-width:180px">
+      <label>Nom de la catégorie</label>
+      <input type="text" name="nom" placeholder="ex: Électronique" required>
+    </div>
+    <div class="fg" style="margin:0;width:120px">
+      <label>Icône</label>
+      <input type="text" name="icone" placeholder="ti-tag" value="ti-tag">
+    </div>
+    <button type="submit" class="btn btn-gold"><i class="ti ti-check"></i> Ajouter</button>
+  </form>
+
+  {{-- Liste des catégories --}}
+  @if($categories->isEmpty())
+  <div style="text-align:center;padding:1.5rem;color:#bbb;font-size:13px">
+    <i class="ti ti-tag" style="font-size:2rem;display:block;margin-bottom:.5rem"></i>
+    Aucune catégorie — créez-en une pour organiser vos produits
+  </div>
+  @else
+  <div style="display:flex;flex-wrap:wrap;gap:.5rem">
+    @foreach($categories as $cat)
+    <div style="display:flex;align-items:center;gap:.5rem;background:#F9F9F6;border:.5px solid #E5E5E0;border-radius:6px;padding:6px 12px;font-size:13px">
+      <i class="ti {{ $cat->icone ?? 'ti-tag' }}" style="color:var(--primary)"></i>
+      <span>{{ $cat->nom }}</span>
+      <form method="POST" action="{{ route('admin.categories.destroy', $cat) }}" onsubmit="return confirm('Supprimer ?')" style="margin:0">
+        @csrf @method('DELETE')
+        <button type="submit" style="background:none;border:none;cursor:pointer;color:#CCC;font-size:14px;padding:0;line-height:1" title="Supprimer">×</button>
+      </form>
+    </div>
+    @endforeach
+  </div>
+  @endif
+</div>
+
 @endsection

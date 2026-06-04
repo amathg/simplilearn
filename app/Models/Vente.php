@@ -13,4 +13,5 @@ class Vente extends Model {
     public function boutique() { return $this->belongsTo(Boutique::class); }
     public function client()   { return $this->belongsTo(Client::class); }
     public function lignes()   { return $this->hasMany(VenteLigne::class); }
+    public function magasin()  { return $this->belongsTo(\App\Models\Magasin::class); }
 }
